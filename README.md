@@ -1,66 +1,56 @@
-## Foundry
+## Reentrancy Attack
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+Reentrancy Attack is a type of exploit wchich allows an exploter to repeatedly call a particular function. The Major cause of this attack is usually a failure to comply with the CEI(Checks, Effects, Interactions) principle or(and) failure to use a reentrant safeguard. An example of a reentrant safeguard can be:
 
-Foundry consists of:
+```
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.18;
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+contract ReEntrancyGuard {
+bool internal locked;
 
-## Documentation
+    modifier noReentrant() {
+        require(!locked, "No re-entrancy");
+        locked = true;
+        _;
+        locked = false;
+    }
 
-https://book.getfoundry.sh/
-
-## Usage
-
-### Build
-
-```shell
-$ forge build
+}
 ```
 
-### Test
+Protocols can also Use this Openzeppelin code as a nonRentrant guard: (https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/ReentrancyGuard.sol)
+
+Since Reentrancy attack as said before is caused by majorly two factors, the best way to fight this problem is to always ensure to follow the CEI principle or(and) use a Reentrancy guard when interacting with external contract.
+
+## TESTING
+
+To test this contract simple run the following command:
+
+1. Clone the Repo
 
 ```shell
-$ forge test
+git clone https://github.com/Chinwuba22/Reentrancy-Attack.git
 ```
 
-### Format
+2. Read and understand the contracts in `src` folder
+
+3. Compile all file
 
 ```shell
-$ forge fmt
+forge build
 ```
 
-### Gas Snapshots
+or
 
 ```shell
-$ forge snapshot
+forge compile
 ```
 
-### Anvil
+4. Read and understand the contracts in `test` folder
+
+5. Run Test
 
 ```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
+forge test --match-test test_attackScenerio -vvv
 ```
